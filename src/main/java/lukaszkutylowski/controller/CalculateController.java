@@ -3,8 +3,11 @@ package lukaszkutylowski.controller;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.Scanner;
 
 public class CalculateController {
 
@@ -18,6 +21,7 @@ public class CalculateController {
     private BigDecimal number1;
     private BigDecimal number2;
     private BigDecimal resultNumber;
+    private Integer precision;
     private char sign;
     private boolean isFirstNumber = true;
 
@@ -172,23 +176,24 @@ public class CalculateController {
 
     @FXML
     public void clickEquals() {
+        setPrecision();
         number2 = new BigDecimal(resultValue);
 
         switch (sign) {
             case '+':
-                resultNumber = number1.add(number2, MathContext.DECIMAL32);
+                resultNumber = number1.add(number2, MathContext.DECIMAL32).setScale(precision, BigDecimal.ROUND_HALF_UP);
                 showCalculate("+", resultNumber);
                 break;
             case '-':
-                resultNumber = number1.subtract(number2, MathContext.DECIMAL32);
+                resultNumber = number1.subtract(number2, MathContext.DECIMAL32).setScale(precision, BigDecimal.ROUND_HALF_UP);
                 showCalculate("-", resultNumber);
                 break;
             case '*':
-                resultNumber = number1.multiply(number2, MathContext.DECIMAL32);
+                resultNumber = number1.multiply(number2, MathContext.DECIMAL32).setScale(precision, BigDecimal.ROUND_HALF_UP);
                 showCalculate("*", resultNumber);
                 break;
             case '/':
-                resultNumber = number1.divide(number2, MathContext.DECIMAL32);
+                resultNumber = number1.divide(number2, MathContext.DECIMAL32).setScale(precision, BigDecimal.ROUND_HALF_UP);
                 showCalculate("-", resultNumber);
                 break;
         }
@@ -200,7 +205,7 @@ public class CalculateController {
 
     private void showCalculate(String setSign, BigDecimal resultNumber) {
         resultValue = resultNumber.toString();
-        result.setText(number1.toString() + setSign + number2.toString() + "=" + resultValue);
+        result.setText(resultValue);
     }
 
     /*
@@ -215,5 +220,22 @@ public class CalculateController {
         resultValue = "";
         showSign.setText(resultValue);
         result.setText(resultValue);
+    }
+
+    /*
+    *   Set precision method
+    * */
+
+    public void setPrecision() {
+        String filePath = "C:\\Users\\Łukasz\\IdeaProjects\\SimpleJavaFxCalculator\\src\\main\\resources\\precision\\precision.txt";
+        File file = new File(filePath);
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String precisionString = scanner.nextLine().trim();
+        precision = Integer.parseInt(precisionString);
     }
 }
